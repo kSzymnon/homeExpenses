@@ -10,7 +10,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </div>
 
             <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
-                <div className="container flex h-14 max-w-screen-xl items-center justify-between px-4 sm:px-8 mx-auto">
+                <div className="flex h-14 w-full items-center justify-between px-4 sm:px-8">
                     <div className="flex items-center gap-2">
                         <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                             CoupleFunds

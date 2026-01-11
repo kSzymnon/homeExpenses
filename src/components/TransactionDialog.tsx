@@ -68,17 +68,15 @@ export function TransactionDialog() {
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <div className="fixed bottom-0 left-0 right-0 p-8 z-50 pointer-events-none flex justify-center">
-                <div className="w-full max-w-screen-xl flex justify-end px-4 sm:px-8">
-                    <DialogTrigger asChild>
-                        <Button
-                            size="icon"
-                            className="pointer-events-auto h-14 w-14 rounded-full shadow-2xl hover:scale-105 transition-all bg-primary text-primary-foreground animate-in zoom-in duration-300"
-                        >
-                            <Plus className="h-6 w-6" />
-                        </Button>
-                    </DialogTrigger>
-                </div>
+            <div className="fixed bottom-8 right-8 z-50">
+                <DialogTrigger asChild>
+                    <Button
+                        size="icon"
+                        className="h-14 w-14 rounded-full shadow-2xl hover:scale-105 transition-all bg-primary text-primary-foreground animate-in zoom-in duration-300"
+                    >
+                        <Plus className="h-6 w-6" />
+                    </Button>
+                </DialogTrigger>
             </div>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>

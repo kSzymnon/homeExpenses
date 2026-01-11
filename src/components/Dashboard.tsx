@@ -4,7 +4,7 @@ import { calculateFinancials } from "@/lib/calculations"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Trophy, Users, PiggyBank } from "lucide-react"
+import { Trophy, Users } from "lucide-react"
 import { TransactionDialog } from "./TransactionDialog"
 import { ExpensesChart } from "./ExpensesChart"
 import { RecentTransactions } from "./RecentTransactions"
@@ -14,14 +14,20 @@ export function Dashboard() {
     const { users, incomes, expenses, goals } = useStore()
     const financials = calculateFinancials(users, incomes, expenses, goals)
 
-    const householdExpenses = expenses.filter(e => e.is_shared).reduce((sum, e) => sum + e.amount, 0)
     const totalGoalContribution = goals.reduce((sum, g) => sum + g.monthly_contribution, 0)
 
     const [currentMonth, setCurrentMonth] = useState(new Date())
+    const [activeTab, setActiveTab] = useState("overview")
+
+    // Household Totals Calculation
+    const totalHouseholdIncome = financials.reduce((sum, f) => sum + f.totalIncome, 0)
+    // householdExpenses is already defined above
+    const totalSpent = expenses.reduce((sum, e) => sum + e.amount, 0) // Total money out
+    const householdLeftover = totalHouseholdIncome - totalSpent - totalGoalContribution
 
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <Tabs defaultValue="overview" className="w-full">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="grid w-full grid-cols-4 mb-8">
                     <TabsTrigger value="overview">Overview</TabsTrigger>
                     <TabsTrigger value="analytics">Analytics</TabsTrigger>
@@ -72,38 +78,51 @@ export function Dashboard() {
                         })}
                     </div>
 
-                    {/* Household Stats & Quick Recents */}
-                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-                        <div className="md:col-span-1 lg:col-span-4 grid gap-4">
-                            <div className="grid gap-4 md:grid-cols-2">
-                                <Card className="bg-card/50 backdrop-blur-sm border-primary/20">
-                                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                        <CardTitle className="text-sm font-medium">Household Fixed</CardTitle>
-                                        <Users className="h-4 w-4 text-muted-foreground" />
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="text-2xl font-bold">${householdExpenses}</div>
-                                        <p className="text-xs text-muted-foreground">Bills & Rent</p>
-                                    </CardContent>
-                                </Card>
-                                <Card className="bg-card/50 backdrop-blur-sm border-primary/20">
-                                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                        <CardTitle className="text-sm font-medium">Monthly Savings</CardTitle>
-                                        <PiggyBank className="h-4 w-4 text-muted-foreground" />
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="text-2xl font-bold">${totalGoalContribution}</div>
-                                        <p className="text-xs text-muted-foreground">Goal Commit</p>
-                                    </CardContent>
-                                </Card>
-                            </div>
-                            <Card className="bg-card/50 backdrop-blur-sm border-primary/20 p-6">
-                                <h3 className="font-semibold mb-4">Quick Actions</h3>
-                                <p className="text-sm text-muted-foreground">Use the + button below to add transactions.</p>
-                            </Card>
-                        </div>
-                        <div className="md:col-span-1 lg:col-span-3">
-                            <RecentTransactions limit={5} />
+                    {/* Household Overview & Recent Activity */}
+                    <div className="grid gap-6 md:grid-cols-2">
+                        {/* Household Overview */}
+                        <Card className="bg-card/50 backdrop-blur-sm border-primary/20 md:col-span-2 lg:col-span-1">
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <Users className="h-5 w-5 text-primary" /> Household Overview
+                                </CardTitle>
+                                <CardDescription>Combined financials for this month</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                                <div>
+                                    <div className="text-sm font-medium text-muted-foreground mb-1">Total Leftover</div>
+                                    <div className="text-4xl font-bold tracking-tight">${householdLeftover.toFixed(2)}</div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="text-muted-foreground">Total Income</span>
+                                        <span className="font-medium text-green-500">+${totalHouseholdIncome}</span>
+                                    </div>
+                                    <Progress value={100} className="h-1 bg-green-500/20" />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="text-muted-foreground">Total Spent</span>
+                                        <span className="font-medium text-red-500">-${totalSpent}</span>
+                                    </div>
+                                    <Progress value={(totalSpent / totalHouseholdIncome) * 100} className="h-1 bg-red-500/20" />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="text-muted-foreground">Total Savings</span>
+                                        <span className="font-medium text-blue-500">-${totalGoalContribution}</span>
+                                    </div>
+                                    <Progress value={(totalGoalContribution / totalHouseholdIncome) * 100} className="h-1 bg-blue-500/20" />
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* Recent Activity */}
+                        <div className="md:col-span-2 lg:col-span-1">
+                            <RecentTransactions limit={4} onViewHistory={() => setActiveTab("history")} />
                         </div>
                     </div>
                 </TabsContent>

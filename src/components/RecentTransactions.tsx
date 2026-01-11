@@ -1,8 +1,14 @@
 import { useStore } from "@/store/useStore"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { ArrowDownRight, ArrowUpRight, History, Target } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { ArrowDownRight, ArrowUpRight, History, Target, ChevronRight } from "lucide-react"
 
-export function RecentTransactions({ limit }: { limit?: number }) {
+interface RecentTransactionsProps {
+    limit?: number
+    onViewHistory?: () => void
+}
+
+export function RecentTransactions({ limit, onViewHistory }: RecentTransactionsProps) {
     const { expenses, incomes, goals } = useStore()
 
     // Combine and sort transactions
@@ -14,14 +20,14 @@ export function RecentTransactions({ limit }: { limit?: number }) {
         .slice(0, limit || 50) // Default to 50 if no limit
 
     return (
-        <Card className="h-full bg-card/50 backdrop-blur-sm border-primary/20">
+        <Card className="h-full bg-card/50 backdrop-blur-sm border-primary/20 flex flex-col">
             <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
                     <History className="h-5 w-5 text-primary" /> Recent Activity
                 </CardTitle>
                 <CardDescription> Latest financial moves </CardDescription>
             </CardHeader>
-            <CardContent className="grid gap-4">
+            <CardContent className="grid gap-4 flex-1">
                 {transactions.length === 0 && (
                     <div className="text-sm text-muted-foreground text-center py-4">No recent activity</div>
                 )}
@@ -62,6 +68,13 @@ export function RecentTransactions({ limit }: { limit?: number }) {
                     )
                 })}
             </CardContent>
+            {limit && onViewHistory && (
+                <CardFooter className="pt-2">
+                    <Button variant="ghost" className="w-full justify-between" onClick={onViewHistory}>
+                        View Full History <ChevronRight className="h-4 w-4" />
+                    </Button>
+                </CardFooter>
+            )}
         </Card>
     )
 }
