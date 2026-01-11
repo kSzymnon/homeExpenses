@@ -6,16 +6,28 @@ import { useStore } from "@/store/useStore"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { TrendingDown } from "lucide-react"
 
-export function ExpensesChart() {
+interface ExpensesChartProps {
+    currentMonth?: Date
+}
+
+export function ExpensesChart({ currentMonth }: ExpensesChartProps) {
     const { expenses } = useStore()
 
     const chartData = useMemo(() => {
-        // Filter for current month approx (mock data assumes "now" is relevant, but let's just group all for MVP demo if dates aren't varied enough, 
-        // OR strictly filter if we added dates properly. Let's group ALL expenses by category for the "Monthly" view assumption)
-
         const categoryTotals: Record<string, number> = {}
 
         expenses.forEach(expense => {
+            // If currentMonth is provided, filter by it
+            if (currentMonth) {
+                const expenseDate = new Date(expense.created_at)
+                if (
+                    expenseDate.getFullYear() !== currentMonth.getFullYear() ||
+                    expenseDate.getMonth() !== currentMonth.getMonth()
+                ) {
+                    return
+                }
+            }
+
             const cat = expense.category
             categoryTotals[cat] = (categoryTotals[cat] || 0) + expense.amount
         })
@@ -24,7 +36,7 @@ export function ExpensesChart() {
             name: name.charAt(0).toUpperCase() + name.slice(1),
             value
         })).sort((a, b) => b.value - a.value)
-    }, [expenses])
+    }, [expenses, currentMonth])
 
     const COLORS = [
         "hsl(var(--chart-1))",
@@ -51,16 +63,20 @@ export function ExpensesChart() {
     }
 
     return (
-        <Card className="col-span-1 md:col-span-2 lg:col-span-1 flex flex-col bg-card/50 backdrop-blur-sm border-primary/20">
-            <CardHeader className="items-center pb-0">
+        <Card className="col-span-1 md:col-span-2 lg:col-span-1 flex flex-col bg-card/50 backdrop-blur-sm border-primary/20 min-h-[350px]">
+            <CardHeader className="pb-0">
                 <CardTitle className="flex items-center gap-2 text-lg">
                     <TrendingDown className="h-5 w-5 text-primary" /> Spending Breakdown
                 </CardTitle>
                 <CardDescription>Expenses by Category</CardDescription>
             </CardHeader>
             <CardContent className="flex-1 pb-0">
-                <div className="h-[250px] w-full relative">
-                    <ResponsiveContainer width="100%" height="100%">
+                <div className="w-full relative">
+                    <div className="absolute inset-0 flex items-center justify-center flex-col pointer-events-none">
+                        <span className="text-3xl font-bold">${total}</span>
+                        <span className="text-xs text-muted-foreground">Total</span>
+                    </div>
+                    <ResponsiveContainer width="100%" height={250}>
                         <RechartsPieChart>
                             <Pie
                                 data={chartData}
@@ -82,10 +98,6 @@ export function ExpensesChart() {
                             />
                         </RechartsPieChart>
                     </ResponsiveContainer>
-                    <div className="absolute inset-0 flex items-center justify-center flex-col pointer-events-none">
-                        <span className="text-3xl font-bold">${total}</span>
-                        <span className="text-xs text-muted-foreground">Total</span>
-                    </div>
                 </div>
             </CardContent>
             <div className="p-6 pt-0 grid grid-cols-2 gap-2 text-sm">
