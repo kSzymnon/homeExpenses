@@ -1,60 +1,124 @@
 import { create } from 'zustand'
 import type { User, Income, Expense, Goal } from '../lib/types'
+import { supabase } from '../lib/supabase'
 
 interface StoreState {
     users: User[]
     incomes: Income[]
     expenses: Expense[]
     goals: Goal[]
+    isLoading: boolean
+    error: string | null
 
     // Actions
+    fetchData: () => Promise<void>
     addUser: (user: User) => void
-    addIncome: (income: Income) => void
-    addExpense: (expense: Expense) => void
-    addGoal: (goal: Goal) => void
-    updateGoal: (id: string, amount: number) => void
+    addIncome: (income: Income) => Promise<void>
+    addExpense: (expense: Expense) => Promise<void>
+    addGoal: (goal: Goal) => Promise<void>
+    updateGoal: (id: string, amount: number) => Promise<void>
 }
 
 export const useStore = create<StoreState>((set) => ({
-    users: [
-        { id: '1', name: 'Alex', email: 'alex@example.com', avatar_url: 'https://github.com/shadcn.png' },
-        { id: '2', name: 'Sam', email: 'sam@example.com', avatar_url: '' },
-    ],
-    incomes: [
-        { id: '1', created_at: new Date().toISOString(), title: 'Salary', amount: 5000, user_id: '1', is_recurring: true },
-        { id: '2', created_at: new Date().toISOString(), title: 'Salary', amount: 4200, user_id: '2', is_recurring: true },
-    ],
-    expenses: [
-        { id: '1', created_at: new Date().toISOString(), title: 'Rent', amount: 2000, payer_id: '1', is_shared: true, category: 'housing' },
-        { id: '2', created_at: new Date().toISOString(), title: 'Groceries', amount: 600, payer_id: '2', is_shared: true, category: 'food' },
-        { id: '3', created_at: new Date().toISOString(), title: 'Netflix', amount: 15, payer_id: '1', is_shared: true, category: 'entertainment' },
-        { id: '4', created_at: new Date().toISOString(), title: 'Gym', amount: 50, payer_id: '1', is_shared: false, category: 'other' },
-        { id: '5', created_at: new Date().toISOString(), title: 'Books', amount: 30, payer_id: '2', is_shared: false, category: 'other' },
-    ],
-    goals: [
-        { id: '1', created_at: new Date().toISOString(), title: 'New Car', target_amount: 15000, current_amount: 5000, monthly_contribution: 400 },
-        { id: '2', created_at: new Date().toISOString(), title: 'Summer Trip', target_amount: 3000, current_amount: 1200, monthly_contribution: 200 },
-    ],
+    users: [],
+    incomes: [],
+    expenses: [],
+    goals: [],
+    isLoading: false,
+    error: null,
 
-    addUser: (user) => set((state) => ({ users: [...state.users, user] })),
-    addIncome: (income) => set((state) => ({ incomes: [...state.incomes, income] })),
-    addExpense: (expense) => set((state) => {
-        let newGoals = state.goals;
-        // If this expense is a transfer to a goal, update that goal's current amount
-        if (expense.category === 'savings' && expense.linked_goal_id) {
-            newGoals = state.goals.map(g =>
-                g.id === expense.linked_goal_id
-                    ? { ...g, current_amount: g.current_amount + expense.amount }
-                    : g
-            );
+    // Actions
+    fetchData: async () => {
+        set({ isLoading: true, error: null })
+        try {
+            const [usersRes, incomesRes, expensesRes, goalsRes] = await Promise.all([
+                supabase.from('profiles').select('*'),
+                supabase.from('incomes').select('*'),
+                supabase.from('expenses').select('*'),
+                supabase.from('goals').select('*')
+            ])
+
+            if (usersRes.error) throw usersRes.error
+            if (incomesRes.error) throw incomesRes.error
+            if (expensesRes.error) throw expensesRes.error
+            if (goalsRes.error) throw goalsRes.error
+
+            set({
+                users: usersRes.data as User[],
+                incomes: incomesRes.data as Income[],
+                expenses: expensesRes.data as Expense[],
+                goals: goalsRes.data as Goal[],
+                isLoading: false
+            })
+        } catch (error: any) {
+            console.error('Error fetching data:', error)
+            set({ error: error.message, isLoading: false })
         }
-        return {
-            expenses: [...state.expenses, expense],
-            goals: newGoals
-        };
-    }),
-    addGoal: (goal) => set((state) => ({ goals: [...state.goals, goal] })),
-    updateGoal: (id, amount) => set((state) => ({
-        goals: state.goals.map(g => g.id === id ? { ...g, current_amount: amount } : g)
-    })),
+    },
+
+    addUser: async (user) => {
+        try {
+            const { error } = await supabase.from('profiles').insert(user)
+            if (error) throw error
+            set((state) => ({ users: [...state.users, user] }))
+        } catch (error) {
+            console.error('Error adding user:', error)
+        }
+    },
+
+    addIncome: async (income) => {
+        try {
+            const { error } = await supabase.from('incomes').insert(income)
+            if (error) throw error
+            set((state) => ({ incomes: [...state.incomes, income] }))
+        } catch (error) {
+            console.error('Error adding income:', error)
+            // Optionally set error state
+        }
+    },
+
+    addExpense: async (expense) => {
+        try {
+            const { error } = await supabase.from('expenses').insert(expense)
+            if (error) throw error
+
+            set((state) => ({
+                expenses: [...state.expenses, expense]
+            }))
+
+            // Handle linked goal update if necessary
+            if (expense.category === 'savings' && expense.linked_goal_id) {
+                const goal = useStore.getState().goals.find(g => g.id === expense.linked_goal_id)
+                if (goal) {
+                    const newAmount = goal.current_amount + expense.amount
+                    await useStore.getState().updateGoal(goal.id, newAmount)
+                }
+            }
+
+        } catch (error) {
+            console.error('Error adding expense:', error)
+        }
+    },
+
+    addGoal: async (goal) => {
+        try {
+            const { error } = await supabase.from('goals').insert(goal)
+            if (error) throw error
+            set((state) => ({ goals: [...state.goals, goal] }))
+        } catch (error) {
+            console.error('Error adding goal:', error)
+        }
+    },
+
+    updateGoal: async (id, amount) => {
+        try {
+            const { error } = await supabase.from('goals').update({ current_amount: amount }).eq('id', id)
+            if (error) throw error
+            set((state) => ({
+                goals: state.goals.map(g => g.id === id ? { ...g, current_amount: amount } : g)
+            }))
+        } catch (error) {
+            console.error('Error updating goal:', error)
+        }
+    },
 }))

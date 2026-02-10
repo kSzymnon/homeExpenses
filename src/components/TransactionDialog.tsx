@@ -63,6 +63,12 @@ const goalSchema = z.object({
     monthly_contribution: z.string().refine((val) => !isNaN(Number(val)) && Number(val) >= 0, "Contribution must be positive"),
 })
 
+const userSchema = z.object({
+    name: z.string().min(2, "Name is too short"),
+    email: z.string().email("Invalid email address"),
+    income: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, "Income must be positive"),
+})
+
 export function TransactionDialog() {
     const [open, setOpen] = useState(false)
 
@@ -86,10 +92,11 @@ export function TransactionDialog() {
                     </DialogDescription>
                 </DialogHeader>
                 <Tabs defaultValue="expense" className="w-full">
-                    <TabsList className="grid w-full grid-cols-3 mb-4">
+                    <TabsList className="grid w-full grid-cols-4 mb-4">
                         <TabsTrigger value="expense">Expense</TabsTrigger>
                         <TabsTrigger value="income">Income</TabsTrigger>
                         <TabsTrigger value="goal">Goal</TabsTrigger>
+                        <TabsTrigger value="user">User</TabsTrigger>
                     </TabsList>
                     <TabsContent value="expense">
                         <ExpenseForm onSuccess={() => setOpen(false)} />
@@ -99,6 +106,9 @@ export function TransactionDialog() {
                     </TabsContent>
                     <TabsContent value="goal">
                         <GoalForm onSuccess={() => setOpen(false)} />
+                    </TabsContent>
+                    <TabsContent value="user">
+                        <UserForm onSuccess={() => setOpen(false)} />
                     </TabsContent>
                 </Tabs>
             </DialogContent>
@@ -144,7 +154,7 @@ function ExpenseForm({ onSuccess }: { onSuccess: () => void }) {
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Title</FormLabel>
-                            <FormControl><Input placeholder="Groceries, Rent..." {...field} /></FormControl>
+                            <FormControl><Input placeholder="Groceries, Rent..." className="glass-input" {...field} /></FormControl>
                             <FormMessage />
                         </FormItem>
                     )}
@@ -155,7 +165,7 @@ function ExpenseForm({ onSuccess }: { onSuccess: () => void }) {
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Amount ($)</FormLabel>
-                            <FormControl><Input type="number" step="0.01" placeholder="0.00" {...field} /></FormControl>
+                            <FormControl><Input type="number" step="0.01" placeholder="0.00" className="glass-input" {...field} /></FormControl>
                             <FormMessage />
                         </FormItem>
                     )}
@@ -250,7 +260,7 @@ function ExpenseForm({ onSuccess }: { onSuccess: () => void }) {
                         </FormItem>
                     )}
                 />
-                <Button type="submit" className="w-full">Add Expense</Button>
+                <Button type="submit" className="w-full bg-gradient-to-r from-primary to-secondary font-bold shadow-lg">Add Expense</Button>
             </form>
         </Form>
     )
@@ -283,7 +293,7 @@ function IncomeForm({ onSuccess }: { onSuccess: () => void }) {
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Source</FormLabel>
-                            <FormControl><Input placeholder="Bonus, Freelance..." {...field} /></FormControl>
+                            <FormControl><Input placeholder="Bonus, Freelance..." className="glass-input" {...field} /></FormControl>
                             <FormMessage />
                         </FormItem>
                     )}
@@ -294,7 +304,7 @@ function IncomeForm({ onSuccess }: { onSuccess: () => void }) {
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Amount ($)</FormLabel>
-                            <FormControl><Input type="number" step="0.01" {...field} /></FormControl>
+                            <FormControl><Input type="number" step="0.01" className="glass-input" {...field} /></FormControl>
                             <FormMessage />
                         </FormItem>
                     )}
@@ -313,7 +323,7 @@ function IncomeForm({ onSuccess }: { onSuccess: () => void }) {
                         </FormItem>
                     )}
                 />
-                <Button type="submit" className="w-full">Add Income</Button>
+                <Button type="submit" className="w-full bg-gradient-to-r from-green-500 to-emerald-600 font-bold shadow-lg">Add Income</Button>
             </form>
         </Form>
     )
@@ -346,7 +356,7 @@ function GoalForm({ onSuccess }: { onSuccess: () => void }) {
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Goal Name</FormLabel>
-                            <FormControl><Input placeholder="New House..." {...field} /></FormControl>
+                            <FormControl><Input placeholder="New House..." className="glass-input" {...field} /></FormControl>
                             <FormMessage />
                         </FormItem>
                     )}
@@ -357,7 +367,7 @@ function GoalForm({ onSuccess }: { onSuccess: () => void }) {
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Target Amount ($)</FormLabel>
-                            <FormControl><Input type="number" step="100" {...field} /></FormControl>
+                            <FormControl><Input type="number" step="100" className="glass-input" {...field} /></FormControl>
                             <FormMessage />
                         </FormItem>
                     )}
@@ -368,12 +378,84 @@ function GoalForm({ onSuccess }: { onSuccess: () => void }) {
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Monthly Contribution ($)</FormLabel>
-                            <FormControl><Input type="number" step="50" {...field} /></FormControl>
+                            <FormControl><Input type="number" step="50" className="glass-input" {...field} /></FormControl>
                             <FormMessage />
                         </FormItem>
                     )}
                 />
-                <Button type="submit" className="w-full">Create Goal</Button>
+                <Button type="submit" className="w-full bg-gradient-to-r from-blue-500 to-cyan-600 font-bold shadow-lg">Create Goal</Button>
+            </form>
+        </Form>
+    )
+}
+
+
+
+function UserForm({ onSuccess }: { onSuccess: () => void }) {
+    const { addUser, addIncome } = useStore()
+    const form = useForm<z.infer<typeof userSchema>>({
+        resolver: zodResolver(userSchema),
+        defaultValues: { name: "", email: "", income: "" }
+    })
+    async function onSubmit(values: z.infer<typeof userSchema>) {
+        const userId = crypto.randomUUID()
+        // 1. Create User
+        await addUser({
+            id: userId,
+            name: values.name,
+            email: values.email,
+        })
+
+        // 2. Create Initial Income Entry
+        await addIncome({
+            id: crypto.randomUUID(),
+            created_at: new Date().toISOString(),
+            title: 'Monthly Income',
+            amount: Number(values.income),
+            user_id: userId,
+            is_recurring: true
+        })
+
+        onSuccess()
+        form.reset()
+    }
+    return (
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Name</FormLabel>
+                            <FormControl><Input placeholder="John Doe" className="glass-input" {...field} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Email</FormLabel>
+                            <FormControl><Input type="email" placeholder="john@example.com" className="glass-input" {...field} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="income"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Monthly Income ($)</FormLabel>
+                            <FormControl><Input type="number" step="100" placeholder="5000" className="glass-input" {...field} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <Button type="submit" className="w-full bg-gradient-to-r from-purple-500 to-pink-600 font-bold shadow-lg">Add User & Income</Button>
             </form>
         </Form>
     )

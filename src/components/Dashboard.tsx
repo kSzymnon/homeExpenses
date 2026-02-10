@@ -42,7 +42,7 @@ export function Dashboard() {
                         {financials.map(f => {
                             const user = users.find(u => u.id === f.userId)
                             return (
-                                <Card key={f.userId} className="relative overflow-hidden border-2 hover:border-primary/50 transition-colors shadow-lg">
+                                <Card key={f.userId} className="relative overflow-hidden glass-card border-none hover:bg-white/5 transition-colors shadow-2xl group">
                                     <CardHeader>
                                         <CardTitle className="flex items-center gap-2">
                                             <span className={`w-2 h-2 rounded-full ${f.disposableIncome > 0 ? 'bg-green-500' : 'bg-red-500'}`} />
@@ -81,7 +81,7 @@ export function Dashboard() {
                     {/* Household Overview & Recent Activity */}
                     <div className="grid gap-6 md:grid-cols-2">
                         {/* Household Overview */}
-                        <Card className="bg-card/50 backdrop-blur-sm border-primary/20 md:col-span-2 lg:col-span-1">
+                        <Card className="glass-card border-none md:col-span-2 lg:col-span-1">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
                                     <Users className="h-5 w-5 text-primary" /> Household Overview
@@ -151,7 +151,7 @@ export function Dashboard() {
                         {goals.map(goal => {
                             const progress = (goal.current_amount / goal.target_amount) * 100
                             return (
-                                <Card key={goal.id} className="bg-gradient-to-br from-card to-secondary/10 border-border/60">
+                                <Card key={goal.id} className="glass-card border-none bg-gradient-to-br from-card/40 to-secondary/10 hover:scale-[1.02] transition-transform">
                                     <CardHeader className="pb-2">
                                         <CardTitle className="text-base">{goal.title}</CardTitle>
                                         <CardDescription className="text-xs">Target: ${goal.target_amount}</CardDescription>
