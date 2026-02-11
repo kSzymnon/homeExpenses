@@ -81,13 +81,13 @@ export function DailySpendingChart({ currentMonth, onMonthChange }: DailySpendin
                     <BarChart data={chartData} margin={{ left: -20, right: 0, top: 0, bottom: 0 }}>
                         <XAxis
                             dataKey="day"
-                            stroke="#888888"
+                            stroke="hsl(var(--muted-foreground))"
                             fontSize={12}
                             tickLine={false}
                             axisLine={false}
                         />
                         <YAxis
-                            stroke="#888888"
+                            stroke="hsl(var(--muted-foreground))"
                             fontSize={12}
                             tickLine={false}
                             axisLine={false}

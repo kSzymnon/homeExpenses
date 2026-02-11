@@ -32,16 +32,16 @@ export function RecentTransactions({ limit, onViewHistory }: RecentTransactionsP
                     <div className="text-sm text-muted-foreground text-center py-4">No recent activity</div>
                 )}
                 {transactions.map((item) => {
-                    let icon = <ArrowDownRight className="h-4 w-4 text-red-500" />
-                    let amountClass = "text-red-500"
+                    let icon = <ArrowDownRight className="h-4 w-4 text-destructive" />
+                    let amountClass = "text-destructive"
                     let label = item.title
 
                     if (item.type === 'income') {
-                        icon = <ArrowUpRight className="h-4 w-4 text-green-500" />
-                        amountClass = "text-green-500"
+                        icon = <ArrowUpRight className="h-4 w-4 text-chart-5" />
+                        amountClass = "text-chart-5"
                     } else if (item.type === 'goal') {
-                        icon = <Target className="h-4 w-4 text-yellow-500" />
-                        amountClass = "text-yellow-500"
+                        icon = <Target className="h-4 w-4 text-chart-4" />
+                        amountClass = "text-chart-4"
                     }
 
                     // Format date relative or short

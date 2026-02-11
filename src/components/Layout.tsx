@@ -1,12 +1,15 @@
 import { ModeToggle } from "./mode-toggle"
+import { SettingsDialog } from "./SettingsDialog"
 
 export function Layout({ children }: { children: React.ReactNode }) {
     return (
         <div className="min-h-screen bg-background font-sans antialiased text-foreground">
             {/* Background blobs for glassmorphism vibe */}
-            <div className="fixed inset-0 -z-10 overflow-hidden">
-                <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl opacity-30 animate-pulse" />
-                <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/20 rounded-full blur-3xl opacity-30" />
+            {/* Background blobs for glassmorphism vibe - Royal Neon Edition */}
+            <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+                <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-primary/20 rounded-full blur-[100px] opacity-40 animate-pulse" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-secondary/20 rounded-full blur-[100px] opacity-40" />
+                <div className="absolute top-[40%] left-[40%] w-[600px] h-[600px] bg-purple-900/20 rounded-full blur-[120px] opacity-30 animate-pulse" style={{ animationDuration: '10s' }} />
             </div>
 
             <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
@@ -16,7 +19,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
                             CoupleFunds
                         </span>
                     </div>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                        <SettingsDialog />
                         <ModeToggle />
                     </div>
                 </div>

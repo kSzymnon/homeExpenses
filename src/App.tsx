@@ -6,10 +6,13 @@ import { OnboardingWizard } from "@/components/OnboardingWizard"
 import { useStore } from "@/store/useStore"
 
 function App() {
-  const { fetchData, users, isLoading } = useStore()
+  const { fetchData, users, isLoading, currentHousehold } = useStore()
 
   useEffect(() => {
-    fetchData()
+    const storedHouseholdId = localStorage.getItem('homeExpenses_householdId')
+    if (storedHouseholdId) {
+      fetchData(storedHouseholdId)
+    }
   }, [fetchData])
 
   if (isLoading) {
@@ -20,8 +23,11 @@ function App() {
     )
   }
 
-  // Show onboarding if no users exist (First Run)
-  if (!isLoading && users.length === 0) {
+  // Show onboarding if no users exist OR no household is selected
+  // We check for currentHousehold too because we need it for everything to work
+  // If we have a stored household ID but users are empty (e.g. fetch failed or empty DB), we might still show onboarding or handle error.
+  // But strictly: if no currentHousehold in store (and we tried to fetch), show onboarding.
+  if (!isLoading && !currentHousehold) {
     return (
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <OnboardingWizard />

@@ -200,7 +200,7 @@ function ExpenseForm({ onSuccess }: { onSuccess: () => void }) {
                                         <SelectTrigger><SelectValue placeholder="Category" /></SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        <SelectItem value="savings" className="font-semibold text-green-600">Savings (Transfer to Goal)</SelectItem>
+                                        <SelectItem value="savings" className="font-semibold text-chart-5">Savings (Transfer to Goal)</SelectItem>
                                         {['housing', 'food', 'transport', 'entertainment', 'utilities', 'other'].map(c => (
                                             <SelectItem key={c} value={c} className="capitalize">{c}</SelectItem>
                                         ))}
@@ -323,7 +323,7 @@ function IncomeForm({ onSuccess }: { onSuccess: () => void }) {
                         </FormItem>
                     )}
                 />
-                <Button type="submit" className="w-full bg-gradient-to-r from-green-500 to-emerald-600 font-bold shadow-lg">Add Income</Button>
+                <Button type="submit" className="w-full bg-gradient-to-r from-chart-5 to-emerald-600 font-bold shadow-lg">Add Income</Button>
             </form>
         </Form>
     )
@@ -383,7 +383,7 @@ function GoalForm({ onSuccess }: { onSuccess: () => void }) {
                         </FormItem>
                     )}
                 />
-                <Button type="submit" className="w-full bg-gradient-to-r from-blue-500 to-cyan-600 font-bold shadow-lg">Create Goal</Button>
+                <Button type="submit" className="w-full bg-gradient-to-r from-chart-3 to-cyan-600 font-bold shadow-lg">Create Goal</Button>
             </form>
         </Form>
     )
@@ -455,7 +455,7 @@ function UserForm({ onSuccess }: { onSuccess: () => void }) {
                         </FormItem>
                     )}
                 />
-                <Button type="submit" className="w-full bg-gradient-to-r from-purple-500 to-pink-600 font-bold shadow-lg">Add User & Income</Button>
+                <Button type="submit" className="w-full bg-gradient-to-r from-primary to-secondary font-bold shadow-lg">Add User & Income</Button>
             </form>
         </Form>
     )

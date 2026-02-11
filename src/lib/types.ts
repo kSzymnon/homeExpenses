@@ -1,8 +1,16 @@
+export interface Household {
+    id: string;
+    name: string;
+    code: string;
+    created_at: string;
+}
+
 export interface User {
     id: string;
     name: string;
     email: string;
     avatar_url?: string;
+    household_id?: string;
 }
 
 export type ExpenseCategory = 'housing' | 'food' | 'transport' | 'entertainment' | 'utilities' | 'savings' | 'other';
@@ -15,11 +23,8 @@ export interface Expense {
     payer_id: string;
     is_shared: boolean;
     category: ExpenseCategory;
-    linked_goal_id?: string; // If category is 'savings', which goal does this fund?
-    // If shared, how much does the OTHER person pay? or assumes 50/50?
-    // PRD says: "deduct the 50% share from my partner's leftover balance"
-    // But strictly, expense amount reduces household pot.
-    // Disposable = Income - Share_of_Joint - Individual
+    linked_goal_id?: string;
+    household_id?: string;
 }
 
 export interface Income {
@@ -29,6 +34,7 @@ export interface Income {
     amount: number;
     user_id: string;
     is_recurring: boolean;
+    household_id?: string;
 }
 
 export interface Goal {
@@ -39,4 +45,5 @@ export interface Goal {
     current_amount: number;
     monthly_contribution: number;
     deadline?: string;
+    household_id?: string;
 }

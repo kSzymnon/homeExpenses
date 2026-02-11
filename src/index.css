@@ -5,76 +5,88 @@
 @layer base {
   :root {
     /* 
-      PREMIUM "DEEP NEON" THEME 
-      Base: Deep Blue/Black
-      Primary: Neon Purple/Blue Gradient
+      PREMIUM "ROYAL NEON" THEME 
+      Base: Deep Rich Purple
+      Primary: Electric Violet
     */
-    --background: 240 20% 4%; /* Very deep blue-black */
+    --background: 270 50% 8%;
+    /* Deep rich purple-black */
     --foreground: 210 40% 98%;
 
-    --card: 240 20% 6%; /* Slightly lighter than bg */
+    --card: 270 50% 12%;
+    /* Slightly lighter purple for cards */
     --card-foreground: 210 40% 98%;
 
-    --popover: 240 20% 6%;
+    --popover: 270 50% 12%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 260 100% 65%; /* Neon Purple */
+    --primary: 270 90% 65%;
+    /* Electric Violet */
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 190 100% 50%; /* Neon Cyan/Blue */
-    --secondary-foreground: 240 20% 4%;
+    --secondary: 320 80% 60%;
+    /* Hot Pink/Orchid */
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 240 20% 15%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 270 30% 20%;
+    /* Muted Purple */
+    --muted-foreground: 270 20% 70%;
 
-    --accent: 260 50% 20%;
+    --accent: 270 60% 25%;
+    /* Deep Vibrant Purple for hovers */
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 240 20% 15%; /* Low contrast border */
-    --input: 240 20% 15%;
-    --ring: 260 100% 65%;
+    --border: 270 40% 20%;
+    /* Purple-tinted border */
+    --input: 270 40% 20%;
+    --ring: 270 90% 65%;
 
-    --radius: 1rem; /* More rounded premium feel */
+    --radius: 1rem;
 
-    /* Chart / Data Colors - Vivid & Distinct */
-    --chart-1: 260 100% 65%; /* Purple */
-    --chart-2: 190 100% 50%; /* Cyan */
-    --chart-3: 320 100% 60%; /* Pink */
-    --chart-4: 40 100% 60%;  /* Gold */
-    --chart-5: 150 100% 50%; /* Green */
+    /* Chart / Data Colors - Neon & Vivid */
+    --chart-1: 270 90% 65%;
+    /* Violet */
+    --chart-2: 320 80% 60%;
+    /* Pink */
+    --chart-3: 190 90% 50%;
+    /* Cyan */
+    --chart-4: 40 100% 60%;
+    /* Gold */
+    --chart-5: 150 100% 50%;
+    /* Green */
   }
 
   .dark {
-    --background: 240 20% 4%;
+    --background: 270 50% 8%;
     --foreground: 210 40% 98%;
 
-    --card: 240 20% 6%;
+    --card: 270 50% 12%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 240 20% 6%;
+    --popover: 270 50% 12%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 260 100% 65%;
+    --primary: 270 90% 65%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 190 100% 50%;
-    --secondary-foreground: 240 20% 4%;
+    --secondary: 320 80% 60%;
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 240 20% 15%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 270 30% 20%;
+    --muted-foreground: 270 20% 70%;
 
-    --accent: 260 50% 20%;
+    --accent: 270 60% 25%;
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 240 20% 15%;
-    --input: 240 20% 15%;
-    --ring: 260 100% 65%;
+    --border: 270 40% 20%;
+    --input: 270 40% 20%;
+    --ring: 270 90% 65%;
   }
 }
 
@@ -82,26 +94,27 @@
   * {
     @apply border-border;
   }
+
   body {
-    @apply bg-background text-foreground selection:bg-primary/20 selection:text-primary;
-    /* subtle mesh gradient implementation */
-    background-image: 
-        radial-gradient(circle at 15% 50%, rgba(120, 50, 255, 0.08), transparent 25%),
-        radial-gradient(circle at 85% 30%, rgba(50, 200, 255, 0.08), transparent 25%);
+    @apply bg-background text-foreground selection:bg-primary/30 selection:text-white;
+    /* Rich purple mesh gradient */
+    background-image:
+      radial-gradient(circle at 10% 20%, rgba(130, 50, 255, 0.15), transparent 40%),
+      radial-gradient(circle at 90% 80%, rgba(200, 50, 200, 0.12), transparent 40%);
     background-attachment: fixed;
   }
 }
 
 @layer utilities {
-    .glass-card {
-        @apply bg-card/40 backdrop-blur-xl border border-white/10 shadow-xl;
-    }
-    
-    .glass-input {
-        @apply bg-black/20 border-white/10 focus:border-primary/50 focus:ring-primary/20 backdrop-blur-sm transition-all;
-    }
+  .glass-card {
+    @apply bg-card/30 backdrop-blur-xl border border-white/10 shadow-xl shadow-purple-900/10 transition-all;
+  }
 
-    .text-gradient {
-        @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-purple-400 to-secondary;
-    }
+  .glass-input {
+    @apply bg-black/20 border-white/10 focus:border-primary/50 focus:ring-primary/20 backdrop-blur-sm transition-all text-foreground placeholder:text-muted-foreground/70;
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-purple-400 to-secondary;
+  }
 }

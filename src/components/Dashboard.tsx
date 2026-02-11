@@ -27,6 +27,8 @@ export function Dashboard() {
 
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+
+
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="grid w-full grid-cols-4 mb-8">
                     <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -45,7 +47,7 @@ export function Dashboard() {
                                 <Card key={f.userId} className="relative overflow-hidden glass-card border-none hover:bg-white/5 transition-colors shadow-2xl group">
                                     <CardHeader>
                                         <CardTitle className="flex items-center gap-2">
-                                            <span className={`w-2 h-2 rounded-full ${f.disposableIncome > 0 ? 'bg-green-500' : 'bg-red-500'}`} />
+                                            <span className={`w-2 h-2 rounded-full ${f.disposableIncome > 0 ? 'bg-chart-5' : 'bg-destructive'}`} />
                                             {user?.name}'s Leftover
                                         </CardTitle>
                                         <CardDescription>Safe to spend this month</CardDescription>
@@ -57,7 +59,7 @@ export function Dashboard() {
                                         <div className="mt-6 text-sm space-y-2 p-4 bg-muted/30 rounded-lg">
                                             <div className="flex justify-between">
                                                 <span>Income</span>
-                                                <span className="font-medium text-green-600 dark:text-green-400">+${f.totalIncome}</span>
+                                                <span className="font-medium text-chart-5">+${f.totalIncome}</span>
                                             </div>
                                             <div className="flex justify-between">
                                                 <span>Shared Expenses (50%)</span>
@@ -97,25 +99,25 @@ export function Dashboard() {
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between text-sm">
                                         <span className="text-muted-foreground">Total Income</span>
-                                        <span className="font-medium text-green-500">+${totalHouseholdIncome}</span>
+                                        <span className="font-medium text-chart-5">+${totalHouseholdIncome}</span>
                                     </div>
-                                    <Progress value={100} className="h-1 bg-green-500/20" />
+                                    <Progress value={100} className="h-1 bg-chart-5/20" />
                                 </div>
 
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between text-sm">
                                         <span className="text-muted-foreground">Total Spent</span>
-                                        <span className="font-medium text-red-500">-${totalSpent}</span>
+                                        <span className="font-medium text-destructive">-${totalSpent}</span>
                                     </div>
-                                    <Progress value={(totalSpent / totalHouseholdIncome) * 100} className="h-1 bg-red-500/20" />
+                                    <Progress value={(totalSpent / totalHouseholdIncome) * 100} className="h-1 bg-destructive/20" />
                                 </div>
 
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between text-sm">
                                         <span className="text-muted-foreground">Total Savings</span>
-                                        <span className="font-medium text-blue-500">-${totalGoalContribution}</span>
+                                        <span className="font-medium text-chart-3">-${totalGoalContribution}</span>
                                     </div>
-                                    <Progress value={(totalGoalContribution / totalHouseholdIncome) * 100} className="h-1 bg-blue-500/20" />
+                                    <Progress value={(totalGoalContribution / totalHouseholdIncome) * 100} className="h-1 bg-chart-3/20" />
                                 </div>
                             </CardContent>
                         </Card>
